@@ -10,6 +10,7 @@
       :value="sliderValue"
       :class="{ slider: true, disabled: !isActive }"
       dark
+      hide-details="true"
       dense
     ></v-slider>
   </div>

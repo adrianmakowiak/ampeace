@@ -4,7 +4,6 @@ import _Vue from "vue";
 interface SoundsList {
   [id: string]: Howl;
 }
-
 interface Soundify {
   sounds: SoundsList;
   play(id: string): void;
@@ -54,6 +53,7 @@ class Soundify {
       }
     });
     this.sounds[id] = sound;
+    console.log(Howler.volume());
   }
 
   public stop(id: string) {
@@ -63,6 +63,14 @@ class Soundify {
   public volume(id: string, value: number) {
     console.log(value);
     this.sounds[id].volume(value / 100);
+  }
+
+  public globalVolume(value: number) {
+    Howler.volume(value / 100);
+  }
+
+  public globalMute(muted: boolean) {
+    Howler.mute(muted);
   }
 }
 
