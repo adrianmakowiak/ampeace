@@ -1,0 +1,11 @@
+service: ampeace-backend
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: dev
+  region: eu-central-1
+
+functions:
+  hello:
+    handler: handler.hello
