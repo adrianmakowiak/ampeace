@@ -30,7 +30,7 @@ functions:
             - '/*'
     events:
       - http:
-          path: sound/{id}
+          path: sounds/{id}
           method: get
   soundPost:
     handler: src/lambdas/sound.post
@@ -54,7 +54,7 @@ functions:
         Resource: !GetAtt soundTable.Arn  
     events:
       - http:
-          path: sound
+          path: sounds
           method: post
           request:
             parameters:
