@@ -55,7 +55,8 @@ functions:
               - Ref: soundBucket   
       - Effect: "Allow"
         Action:
-          - dynamodb:PutItem        
+          - dynamodb:PutItem    
+          - dynamodb:DescribeTable    
         Resource: !GetAtt soundTable.Arn  
     events:
       - http:
