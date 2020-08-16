@@ -17,7 +17,7 @@ plugins:
 
 functions:
   soundGet:
-    handler: handler.hello
+    handler: src/lambdas/sound.get
     iamRoleStatements:
       - Effect: "Allow"        
         Action:
@@ -31,8 +31,35 @@ functions:
     events:
       - http:
           path: sound/{id}
-          method: get    
-
+          method: get
+  soundPost:
+    handler: src/lambdas/sound.post
+    iamRoleStatements:
+      - Effect: "Allow"        
+        Action:
+          - s3:PutObject        
+        Resource: 
+          - Fn::Join: 
+            - ''
+            - - 'arn:aws:s3:::'
+              - Ref: soundBucket
+              - '/*'     
+          - Fn::Join: 
+            - ''
+            - - 'arn:aws:s3:::'
+              - Ref: soundBucket   
+      - Effect: "Allow"
+        Action:
+          - dynamodb:PutItem        
+        Resource: !GetAtt soundTable.Arn  
+    events:
+      - http:
+          path: sound
+          method: post
+          request:
+            parameters:
+              querystrings:
+                name: true
 
 resources:
   Resources:
@@ -40,3 +67,18 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ampeace-sounds
+    soundTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provide.stage}-ampeace-sound-table
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+        BillingMode: PAY_PER_REQUEST
