@@ -70,7 +70,7 @@ resources:
     soundTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:provide.stage}-ampeace-sound-table
+        TableName: ${self:provider.stage}-ampeace-sound-table
         KeySchema:
           - AttributeName: PK
             KeyType: HASH
