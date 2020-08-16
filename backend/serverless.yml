@@ -14,6 +14,11 @@ provider:
 plugins:
   - serverless-iam-roles-per-function
   - serverless-cloudformation-sub-variables
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: false # change to true in case of using python packages that require binaries
 
 functions:
   soundGet:

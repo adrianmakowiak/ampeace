@@ -12,6 +12,7 @@
     "serverless-iam-roles-per-function": "^2.0.2"
   },
   "dependencies": {
-    "serverless-cloudformation-sub-variables": "^0.2.1"
+    "serverless-cloudformation-sub-variables": "^0.2.1",
+    "serverless-python-requirements": "^5.1.0"
   }
 }
