@@ -4,16 +4,8 @@ import boto3
 from uuid import uuid4
 #pylint: disable=import-error
 from src.wrapper.wrapper import lambda_wrapper
+from src.models.sound_table import SoundTable
 #pylint: enable=import-error
-
-
-def respond(err, res=None):
-    return {
-        "statusCode": "400" if err else "200",
-        "body": err["message"] if err else json.dumps(res),
-        "headers": {"Content-Type": "application/json"},
-    }
-
 
 s3 = boto3.client('s3')
 dynamo = boto3.client('dynamodb')
@@ -39,22 +31,24 @@ def get(event, context):
 
 @lambda_wrapper
 def post(event, context):
-    print('post')
-    sound_key = uuid4()
-    print(sound_key)
-    print(str(sound_key).join('.mp3'))
+    sound_key = str(uuid4())
     file_content = base64.b64decode(event['body'])
     s3_response = s3.put_object(
         Body=file_content, 
         Bucket='ampeace-sounds', 
-        Key=str(sound_key)+'.mp3', ContentType='audio/mp3'
+        Key=sound_key+'.mp3', ContentType='audio/mp3'
         )
 
     print(s3_response)
 
+    sound_item = SoundTable(PK='sound', SK=sound_key, sound_type='mp3')
+    sound_item.save()
+
     response = {
         'statusCode': 200,
-        'body': json.dumps(event)
+        'body': json.dumps({
+            'soundId': sound_key
+        })
     }
 
     return response
