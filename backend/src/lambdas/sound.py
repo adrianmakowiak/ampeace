@@ -1,6 +1,7 @@
 import json
 import base64
 import boto3
+import botocore
 from uuid import uuid4
 #pylint: disable=import-error
 from src.wrapper.wrapper import lambda_wrapper
@@ -15,7 +16,15 @@ dynamo = boto3.client('dynamodb')
 @lambda_wrapper
 def get(event, context):
     sound_key = event['pathParameters']['id'] + '.mp3'
-    response = s3.get_object(Bucket=BUCKET_NAME, Key=sound_key)
+    try:
+        response = s3.get_object(Bucket=BUCKET_NAME, Key=sound_key)
+    except botocore.exceptions.ClientError as error:
+        if error.response['Error']['Code'] == 'NoSuchKey':
+            return {
+                'statusCode': 404
+            }
+        else:
+            raise Exception(str(error))
 
     audio = response['Body'].read()
 
