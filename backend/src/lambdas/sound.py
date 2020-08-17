@@ -6,18 +6,24 @@ from uuid import uuid4
 #pylint: disable=import-error
 from src.wrapper.wrapper import lambda_wrapper
 from src.models.sound_table import SoundTable
+from src.lambdas.lambda_responses import HttpResponseServerError, HttpOkJSONResponse
 #pylint: enable=import-error
 
 BUCKET_NAME = 'ampeace-sounds'
 
 s3 = boto3.client('s3')
-dynamo = boto3.client('dynamodb')
+
+@lambda_wrapper
+def list(event, context):
+    sounds = SoundTable.query('sound')
+    items = {'items': [dict(sound) for sound in sounds]}
+    return HttpOkJSONResponse(body=items).__dict__()
 
 @lambda_wrapper
 def get(event, context):
     sound_key = event['pathParameters']['id'] + '.mp3'
     try:
-        response = s3.get_object(Bucket=BUCKET_NAME, Key=sound_key)
+        s3_response = s3.get_object(Bucket=BUCKET_NAME, Key=sound_key)
     except botocore.exceptions.ClientError as error:
         if error.response['Error']['Code'] == 'NoSuchKey':
             return {
@@ -26,7 +32,7 @@ def get(event, context):
         else:
             raise Exception(str(error))
 
-    audio = response['Body'].read()
+    audio = s3_response['Body'].read()
 
     response = {
         'statusCode': 200,
@@ -63,4 +69,3 @@ def post(event, context):
     }
 
     return response
-

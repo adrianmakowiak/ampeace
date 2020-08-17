@@ -18,10 +18,26 @@ plugins:
 
 custom:
   pythonRequirements:
+    noDeploy:
+      - boto3
+      - botocore
     dockerizePip: false # change to true in case of using python packages that require binaries
 
 functions:
-  soundGet:
+  soundsList:
+    handler: src/lambdas/sound.list
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:Query
+          - dynamodb:GetItem	
+          - dynamodb:DescribeTable    
+        Resource: !GetAtt soundTable.Arn 
+    events:
+      - http:
+          path: sounds
+          method: get
+  soundsGet:
     handler: src/lambdas/sound.get
     iamRoleStatements:
       - Effect: "Allow"        
@@ -42,7 +58,7 @@ functions:
       - http:
           path: sounds/{id}
           method: get
-  soundPost:
+  soundsPost:
     handler: src/lambdas/sound.post
     iamRoleStatements:
       - Effect: "Allow"        
