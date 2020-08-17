@@ -1,5 +1,6 @@
 import json
 import http
+import base64
 
 
 class HttpResponseLambdaBase:
@@ -48,6 +49,14 @@ class HttpOkJSONResponse(HttpResponseLambdaBase):
         if not body:
             override_body = {}
         self.body = json.dumps(override_body)
+
+class HttpOkFileResponse(HttpResponseLambdaBase):
+    def __init__(self, file=None, file_type=None):
+      if not file:
+        raise Exception('file is falsy')
+      self.is_base_64_encoded = True
+      self.body = base64.b64encode(file)
+      self.headers['Content-Type'] = file_type
 
 
 class HttpCreatedJSONResponse(HttpOkJSONResponse):
