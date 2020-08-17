@@ -26,13 +26,18 @@ functions:
     iamRoleStatements:
       - Effect: "Allow"        
         Action:
-          - s3:GetObject        
+          - s3:GetObject
+          - s3:ListBucket    
         Resource: 
-          Fn::Join: 
-          - ''
-          - - 'arn:aws:s3:::'
-            - Ref: soundBucket
-            - '/*'
+          - Fn::Join: 
+            - ''
+            - - 'arn:aws:s3:::'
+              - Ref: soundBucket
+              - '/*'
+          - Fn::Join: 
+            - ''
+            - - 'arn:aws:s3:::'
+              - Ref: soundBucket
     events:
       - http:
           path: sounds/{id}
