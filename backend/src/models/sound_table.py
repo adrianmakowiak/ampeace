@@ -9,4 +9,5 @@ class SoundTable(Model):
   PK = UnicodeAttribute(hash_key=True)
   SK = UnicodeAttribute(range_key=True)
   sound_type = UnicodeAttribute(attr_name='sT')
+  sound_name = UnicodeAttribute(attr_name='sN')
   
