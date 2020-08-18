@@ -35,12 +35,7 @@ import { Component, Vue } from "vue-property-decorator";
     SoundListItem
   }
 })
-export default class SoundList extends Vue {
-  async mounted() {
-    const sounds = await this.$api.listSounds();
-    console.log(process.env);
-  }
-}
+export default class SoundList extends Vue {}
 </script>
 
 <style scoped>

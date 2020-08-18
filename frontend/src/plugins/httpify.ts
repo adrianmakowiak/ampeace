@@ -27,8 +27,33 @@ class HttpClient {
     });
   }
 
+  private getFile(path: string) {
+    return new Promise((resolve, reject) => {
+      fetch(`${this.url}${path}`)
+        .then(response => {
+          console.log(response);
+          if (!response.ok) throw Error(response.statusText);
+
+          if (response.body) {
+            return response.body.getReader().read();
+          }
+        })
+        .then(result => {
+          resolve(result);
+        })
+        .catch(error => {
+          console.log("error", error);
+          reject(error);
+        });
+    });
+  }
+
   public listSounds() {
     return this.get("sounds");
+  }
+
+  public getSound(id: string) {
+    return this.getFile(`sounds/${id}`);
   }
 }
 
