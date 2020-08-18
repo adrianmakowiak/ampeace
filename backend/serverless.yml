@@ -36,6 +36,7 @@ functions:
     events:
       - http:
           path: sounds
+          cors: true
           method: get
   soundsGet:
     handler: src/lambdas/sound.get
@@ -58,6 +59,7 @@ functions:
       - http:
           path: sounds/{id}
           method: get
+          cors: true
   soundsPost:
     handler: src/lambdas/sound.post
     iamRoleStatements:
@@ -83,6 +85,7 @@ functions:
       - http:
           path: sounds
           method: post
+          cors: true
           request:
             parameters:
               querystrings:

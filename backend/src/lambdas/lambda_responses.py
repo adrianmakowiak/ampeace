@@ -12,7 +12,10 @@ class HttpResponseLambdaBase:
 
     status_code = http.HTTPStatus.OK.value
     is_base_64_encoded = False
-    headers = {}
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': True,
+    }
     body = None
 
     def __dict__(self):
