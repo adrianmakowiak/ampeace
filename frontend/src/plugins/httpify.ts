@@ -27,7 +27,7 @@ class HttpClient {
     });
   }
 
-  public async listSounds() {
+  public listSounds() {
     return this.get("sounds");
   }
 }
