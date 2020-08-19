@@ -12,17 +12,6 @@
       <SoundListItem icon="mdi-train" />
       <SoundListItem icon="mdi-fire" />
     </v-row>
-    <!-- <v-row justify="space-around" class="mb-2">
-      <SoundListItem icon="mdi-fan" />
-      <SoundListItem icon="mdi-weather-night" />
-      <SoundListItem icon="mdi-waves" />
-      <SoundListItem icon="mdi-waveform" />
-      <SoundListItem icon="mdi-coffee-outline" />
-    </v-row>
-    <v-row justify="space-around" class="mb-2">
-      <SoundListItem icon="mdi-water-outline" />
-      <SoundListItem icon="mdi-leaf" />
-    </v-row> -->
   </v-container>
 </template>
 
