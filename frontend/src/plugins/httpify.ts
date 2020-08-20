@@ -6,11 +6,22 @@ declare module "vue/types/vue" {
   }
 }
 
+type ListSoundsResponse = {
+  items: Sound[];
+};
+
+type Sound = {
+  PK: "sound";
+  SK: string;
+  sound_name: string;
+  sound_type: string;
+};
+
 class HttpClient {
   url = process.env.VUE_APP_API_URL;
 
-  private get(path: string) {
-    return new Promise((resolve, reject) => {
+  private get<T>(path: string): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
       fetch(`${this.url}${path}`)
         .then(response => {
           if (!response.ok) throw Error(response.statusText);
@@ -49,7 +60,7 @@ class HttpClient {
   }
 
   public listSounds() {
-    return this.get("sounds");
+    return this.get<ListSoundsResponse>("sounds");
   }
 
   public getSound(id: string) {
@@ -57,8 +68,10 @@ class HttpClient {
   }
 }
 
+export const api = new HttpClient();
+
 export default {
   install(Vue: typeof _Vue) {
-    Vue.prototype.$api = new HttpClient();
+    Vue.prototype.$api = api;
   }
 };

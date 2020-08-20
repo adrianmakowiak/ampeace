@@ -24,7 +24,11 @@ import { Component, Vue } from "vue-property-decorator";
     SoundListItem
   }
 })
-export default class SoundList extends Vue {}
+export default class SoundList extends Vue {
+  mounted() {
+    this.$store.dispatch("setSounds");
+  }
+}
 </script>
 
 <style scoped>
