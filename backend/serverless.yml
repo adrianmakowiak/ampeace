@@ -60,6 +60,29 @@ functions:
           path: sounds/{id}
           method: get
           cors: true
+  soundsPreUpload:
+    handler: src/lambdas/sound.pre_upload
+    iamRoleStatements:
+      - Effect: "Allow"        
+        Action:
+          - s3:GetObject
+          - s3:ListBucket  
+          - s3:PutObject  
+        Resource: 
+          - Fn::Join: 
+            - ''
+            - - 'arn:aws:s3:::'
+              - Ref: soundBucket
+              - '/*'
+          - Fn::Join: 
+            - ''
+            - - 'arn:aws:s3:::'
+              - Ref: soundBucket
+    events:
+      - http:
+          path: sounds/upload-url
+          method: get
+          cors: true
   soundsPost:
     handler: src/lambdas/sound.post
     iamRoleStatements:

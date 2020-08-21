@@ -53,3 +53,31 @@ def post(event, context):
     sound_item.save()
 
     return HttpCreatedJSONResponse(body={'soundId': sound_key}).__dict__()
+
+@lambda_wrapper
+def pre_upload(event, context):
+    sound_key = str(uuid4())
+    upload_url_icon = s3.generate_presigned_post(
+        Bucket=BUCKET_NAME,
+        Key=sound_key + '/icon.svg', 
+        Fields=None,
+        Conditions=[
+            ["content-length-range", 0, 5000]
+        ], 
+        ExpiresIn=3600)
+    upload_url_sound = s3.generate_presigned_post(
+        Bucket=BUCKET_NAME, 
+        Key=sound_key + '/sound.mp3', 
+        Fields=None, 
+        Conditions=[
+            ["content-length-range", 0, 5000000]
+        ], 
+        ExpiresIn=3600)
+    print(upload_url_icon)
+    print(upload_url_sound)
+    response = {
+        'upload_url_icon': upload_url_icon,
+        'upload_url_sound': upload_url_sound
+    }
+
+    return HttpOkJSONResponse(body=response).__dict__()
