@@ -2,8 +2,11 @@
   <v-app class="app">
     <v-app-bar app color="brown lighten-1" dark>
       <v-app-bar-nav-icon></v-app-bar-nav-icon>
-      <v-toolbar-title>Soundify</v-toolbar-title>
+      <router-link class="nav-link" to="/">
+        <v-toolbar-title>Soundify</v-toolbar-title>
+      </router-link>
       <v-spacer></v-spacer>
+      <router-link class="nav-link" to="/admin">Admin</router-link>
       <div class="slider">
         <v-slider
           @end="sliderUpdateValue"
@@ -16,13 +19,12 @@
       </div>
     </v-app-bar>
     <v-main>
-      <Home />
+      <router-view />
     </v-main>
   </v-app>
 </template>
 
 <script lang="ts">
-// import Vue from "vue";
 import { Component, Vue } from "vue-property-decorator";
 
 import Home from "./views/Home.vue";
@@ -57,6 +59,12 @@ export default class App extends Vue {
 #app {
   background-color: #a1887f;
 }
+
+.v-application a.nav-link {
+  text-decoration: none;
+  color: white;
+}
+
 .slider {
   width: 96px;
 }
