@@ -16,7 +16,7 @@
         prepend-icon="mdi-music"
         label="Sound file"
         dark
-        :value="soundFile"
+        v-model="soundFile"
       ></v-file-input>
       <v-file-input
         :rules="fileRules"
@@ -25,9 +25,9 @@
         prepend-icon="mdi-image-area"
         label="Sound icon"
         dark
-        :value="soundIcon"
+        v-model="soundIcon"
       ></v-file-input>
-      <v-btn :disabled="!valid">
+      <v-btn @click="addSound" :disabled="!valid">
         add
       </v-btn>
     </v-form>
@@ -46,11 +46,35 @@ export default class AdminPanel extends Vue {
       (v && v.length <= 10) || "Name must be less than 10 characters"
   ];
 
-  private fileRules = [(v: any) => !!v];
+  private fileRules = [(v: File) => !!v];
 
   private soundName = "";
   private soundFile = null;
   private soundIcon = null;
+
+  public async addSound() {
+    console.log("click");
+    console.log(this.soundFile);
+    console.log(this.soundIcon);
+    const presignedUrls = await this.$api.getUrlsForUpload(this.soundName);
+
+    const uploadSoundPromise = this.$api.uploadFile(
+      presignedUrls.upload_url_sound.url,
+      this.soundFile,
+      presignedUrls.upload_url_sound.fields
+    );
+
+    const uploadIconPromise = this.$api.uploadFile(
+      presignedUrls.upload_url_icon.url,
+      this.soundIcon,
+      presignedUrls.upload_url_icon.fields
+    );
+
+    const uploadResponse = await Promise.all([
+      uploadSoundPromise,
+      uploadIconPromise
+    ]);
+  }
 }
 </script>
 

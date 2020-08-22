@@ -20,6 +20,22 @@ type Sound = {
 class HttpClient {
   url = process.env.VUE_APP_API_URL;
 
+  private post(url: string, data: any) {
+    return new Promise((resolve, reject) => {
+      fetch(url, {
+        method: "post",
+        body: data,
+        mode: "cors"
+      })
+        .then(res => {
+          resolve(res);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  }
+
   private get<T>(path: string): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       fetch(`${this.url}${path}`)
@@ -65,6 +81,19 @@ class HttpClient {
 
   public getSound(id: string) {
     return this.getFile(`sounds/${id}`);
+  }
+
+  public getUrlsForUpload(soundName: string) {
+    return this.get(`sounds/upload-url?name=${soundName}`);
+  }
+
+  public uploadFile(uploadUrl: string, file: File, fields: any) {
+    const formData = new FormData();
+    Object.keys(fields).forEach(key => {
+      formData.append(key, fields[key]);
+    });
+    formData.append("file", file);
+    return this.post(uploadUrl, formData);
   }
 }
 
