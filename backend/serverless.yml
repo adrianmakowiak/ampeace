@@ -11,6 +11,7 @@ provider:
     binaryMediaTypes:
       - '*/*'
 
+
 plugins:
   - serverless-iam-roles-per-function
   - serverless-cloudformation-sub-variables
@@ -24,6 +25,24 @@ custom:
     dockerizePip: false # change to true in case of using python packages that require binaries
 
 functions:
+  s3UploadTrigger:
+    handler: src/lambdas/sound.s3_upload_trigger
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:PutItem
+          - dynamodb:Query
+          - dynamodb:GetItem	
+          - dynamodb:DescribeTable    
+        Resource: !GetAtt soundTable.Arn 
+    events:
+      - s3: 
+          bucket: ampeace-sounds
+          event: s3:ObjectCreated:*
+          rules:
+            - suffix: .mp3
+          existing: true
+
   soundsList:
     handler: src/lambdas/sound.list
     iamRoleStatements:

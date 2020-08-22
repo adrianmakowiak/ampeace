@@ -6,7 +6,7 @@ from uuid import uuid4
 #pylint: disable=import-error
 from src.wrapper.wrapper import lambda_wrapper
 from src.models.sound_table import SoundTable
-from src.lambdas.lambda_responses import HttpOkJSONResponse, HttpCreatedJSONResponse, HttpOkFileResponse
+from src.lambdas.lambda_responses import HttpOkJSONResponse, HttpCreatedJSONResponse, HttpOkFileResponse, HttpNoContentResponse
 #pylint: enable=import-error
 
 BUCKET_NAME = 'ampeace-sounds'
@@ -56,20 +56,27 @@ def post(event, context):
 
 @lambda_wrapper
 def pre_upload(event, context):
-    sound_key = str(uuid4())
+    sound_name = event['queryStringParameters']['name']
+    sound_id = str(uuid4())
     upload_url_icon = s3.generate_presigned_post(
         Bucket=BUCKET_NAME,
-        Key=sound_key + '/icon.svg', 
-        Fields=None,
+        Key=sound_id + '/' + sound_name + '/icon.svg', 
+        Fields={
+            "x-amz-meta-name": sound_name
+        },
         Conditions=[
+            {"x-amz-meta-name": sound_name},
             ["content-length-range", 0, 5000]
         ], 
         ExpiresIn=3600)
     upload_url_sound = s3.generate_presigned_post(
         Bucket=BUCKET_NAME, 
-        Key=sound_key + '/sound.mp3', 
-        Fields=None, 
+        Key=sound_id + '/' + sound_name + '/sound.mp3', 
+        Fields={
+            "x-amz-meta-name": sound_name
+        }, 
         Conditions=[
+            {"x-amz-meta-name": sound_name},
             ["content-length-range", 0, 5000000]
         ], 
         ExpiresIn=3600)
@@ -81,3 +88,12 @@ def pre_upload(event, context):
     }
 
     return HttpOkJSONResponse(body=response).__dict__()
+
+@lambda_wrapper
+def s3_upload_trigger(event, context):
+    file_key = event['Records'][0]['s3']['object']['key']
+    sound_id, sound_name, sound_type = file_key.split('/')
+    sound_item = SoundTable(PK='sound', SK=sound_id, sound_type=sound_type.split('.')[1], sound_name=sound_name)
+    sound_item.save()
+
+    return HttpNoContentResponse().__dict__()
