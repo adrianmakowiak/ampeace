@@ -139,6 +139,12 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ampeace-sounds
+        CorsConfiguration:
+          CorsRules:
+            - AllowedMethods:
+                - POST
+              AllowedOrigins:
+                - "*"
     soundTable:
       Type: AWS::DynamoDB::Table
       Properties:
