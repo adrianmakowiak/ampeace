@@ -50,7 +50,6 @@ export default class AdminPanel extends Vue {
     // const res = await this.$api.getSound(
     //   "15a0a3b7-1aad-4c4a-8b58-db5d8e825d87"
     // );
-    // console.log(res);
   }
 
   private fileRules = [(v: File) => !!v];
@@ -60,9 +59,6 @@ export default class AdminPanel extends Vue {
   private soundIcon: File | null = null;
 
   public async addSound() {
-    console.log("click");
-    console.log(this.soundFile);
-    console.log(this.soundIcon);
     if (this.soundFile && this.soundIcon) {
       const presignedUrls = await this.$api.getUrlsForUpload(this.soundName);
 
