@@ -22,7 +22,7 @@ def list(event, context):
 @lambda_wrapper
 def get(event, context):
     print('get')
-    sound_key = event['pathParameters']['id'] + '.mp3'
+    sound_key = event['pathParameters']['id'] + '/sound.mp3'
     try:
         s3_response = s3.get_object(Bucket=BUCKET_NAME, Key=sound_key)
     except botocore.exceptions.ClientError as error:
@@ -60,7 +60,7 @@ def pre_upload(event, context):
     sound_id = str(uuid4())
     upload_url_icon = s3.generate_presigned_post(
         Bucket=BUCKET_NAME,
-        Key=sound_id + '/' + sound_name + '/icon.svg', 
+        Key=sound_id  + '/icon.svg', 
         Fields={
             "x-amz-meta-name": sound_name
         },
@@ -71,7 +71,7 @@ def pre_upload(event, context):
         ExpiresIn=3600)
     upload_url_sound = s3.generate_presigned_post(
         Bucket=BUCKET_NAME, 
-        Key=sound_id + '/' + sound_name + '/sound.mp3', 
+        Key=sound_id + '/sound.mp3', 
         Fields={
             "x-amz-meta-name": sound_name
         }, 
@@ -92,8 +92,10 @@ def pre_upload(event, context):
 @lambda_wrapper
 def s3_upload_trigger(event, context):
     file_key = event['Records'][0]['s3']['object']['key']
-    sound_id, sound_name, sound_type = file_key.split('/')
-    sound_item = SoundTable(PK='sound', SK=sound_id, sound_type=sound_type.split('.')[1], sound_name=sound_name)
+    file_object_head = s3.head_object(Bucket=BUCKET_NAME, Key=file_key)
+    print(file_object_head)
+    sound_id, sound_type = file_key.split('/')
+    sound_item = SoundTable(PK='sound', SK=sound_id, sound_type=sound_type.split('.')[1], sound_name='sound_name')
     sound_item.save()
 
     return HttpNoContentResponse().__dict__()
