@@ -32,7 +32,18 @@ export interface PresignedPostFields {
   [key: string]: string;
 }
 
-export interface GetUrlsForUploadResponse {
+export type GetUrlsForUploadResponse = {
   upload_url_icon: PresignedPost;
   upload_url_sound: PresignedPost;
-}
+};
+
+export type ListSoundsResponse = {
+  items: Sound[];
+};
+
+export type Sound = {
+  PK: "sound";
+  SK: string;
+  sound_name: string;
+  sound_type: string;
+};

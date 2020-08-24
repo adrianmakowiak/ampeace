@@ -1,21 +1,14 @@
 import _Vue from "vue";
-import { PresignedPost, GetUrlsForUploadResponse } from "../types";
+import {
+  PresignedPost,
+  GetUrlsForUploadResponse,
+  ListSoundsResponse
+} from "../types";
 declare module "vue/types/vue" {
   interface Vue {
     $api: HttpClient;
   }
 }
-
-type ListSoundsResponse = {
-  items: Sound[];
-};
-
-type Sound = {
-  PK: "sound";
-  SK: string;
-  sound_name: string;
-  sound_type: string;
-};
 
 class HttpClient {
   url = process.env.VUE_APP_API_URL;
