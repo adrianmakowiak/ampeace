@@ -2,7 +2,10 @@ import _Vue from "vue";
 import {
   PresignedPost,
   GetUrlsForUploadResponse,
-  ListSoundsResponse
+  ListSoundsResponse,
+  PostRequest,
+  GetRequest,
+  GetUrlParams
 } from "../types";
 declare module "vue/types/vue" {
   interface Vue {
@@ -13,11 +16,21 @@ declare module "vue/types/vue" {
 class HttpClient {
   url = process.env.VUE_APP_API_URL;
 
-  private post<T>(url: string, body: RequestInit["body"]): Promise<T> {
+  private getUrl(params: GetUrlParams): string {
+    if (params.path) {
+      return `${this.url}${params.path}`;
+    } else if (params.url) {
+      return params.url;
+    } else {
+      return this.url;
+    }
+  }
+
+  private post<T>(params: PostRequest): Promise<T> {
     return new Promise<T>((resolve, reject) => {
-      fetch(url, {
+      fetch(this.getUrl(params), {
         method: "post",
-        body,
+        body: params.body,
         mode: "cors"
       })
         .then(res => {
@@ -36,9 +49,9 @@ class HttpClient {
     });
   }
 
-  private get<T>(path: string): Promise<T> {
+  private get<T>(params: GetRequest): Promise<T> {
     return new Promise<T>((resolve, reject) => {
-      fetch(`${this.url}${path}`)
+      fetch(this.getUrl(params))
         .then(response => {
           if (!response.ok) throw Error(response.statusText);
           return response.json();
@@ -51,10 +64,9 @@ class HttpClient {
         });
     });
   }
-
-  private getFile(path: string) {
+  private getFile(params: GetRequest) {
     return new Promise((resolve, reject) => {
-      fetch(`${this.url}${path}`)
+      fetch(this.getUrl(params))
         .then(response => {
           if (!response.ok) throw Error(response.statusText);
           if (response.body) {
@@ -71,19 +83,19 @@ class HttpClient {
   }
 
   public listSounds() {
-    return this.get<ListSoundsResponse>("sounds");
+    return this.get<ListSoundsResponse>({ path: "sounds" });
   }
 
   public getSound(id: string) {
-    return this.getFile(`sounds/${id}`);
+    return this.getFile({ path: `sounds/${id}` });
   }
 
   public getUrlsForUpload(
     soundName: string
   ): Promise<GetUrlsForUploadResponse> {
-    return this.get<GetUrlsForUploadResponse>(
-      `sounds/upload-url?name=${soundName}`
-    );
+    return this.get<GetUrlsForUploadResponse>({
+      path: `sounds/upload-url?name=${soundName}`
+    });
   }
 
   public uploadFileUsingPresignedUrl(presignedPost: PresignedPost, file: File) {
@@ -92,7 +104,7 @@ class HttpClient {
       formData.append(key, presignedPost.fields[key]);
     });
     formData.append("file", file);
-    return this.post(presignedPost.url, formData);
+    return this.post({ url: presignedPost.url, body: formData, path: "asd" });
   }
 }
 

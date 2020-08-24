@@ -47,3 +47,19 @@ export type Sound = {
   sound_name: string;
   sound_type: string;
 };
+
+export type PostRequest = {
+  path?: string;
+  url?: string;
+  body: RequestInit["body"];
+};
+
+export type GetRequest = {
+  path?: string;
+  url?: string;
+};
+
+export type GetUrlParams = {
+  path?: string;
+  url?: string;
+};
