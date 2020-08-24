@@ -159,6 +159,20 @@ resources:
                 - POST
               AllowedOrigins:
                 - "*"
+    soundBucketPolicy: # check if prefix will work, if not then move all sounds to seprated folder and the same with icons
+      Type: AWS::S3::BucketPolicy
+      Properties: 
+        Bucket: 
+          Ref: soundBucket
+        PolicyDocument: 
+          Statment:
+            - Sid: AddPerm,
+              Effect: Allow,
+              Principal": "*"
+              Action:
+                - s3:GetObject
+              Resource:
+                - arn:aws:s3:::ampeace-sounds/*.svg
     soundTable:
       Type: AWS::DynamoDB::Table
       Properties:
