@@ -1,5 +1,5 @@
 import _Vue from "vue";
-
+import { PresignedPost, GetUrlsForUploadResponse } from "../types";
 declare module "vue/types/vue" {
   interface Vue {
     $api: HttpClient;
@@ -20,15 +20,22 @@ type Sound = {
 class HttpClient {
   url = process.env.VUE_APP_API_URL;
 
-  private post(url: string, data: any) {
-    return new Promise((resolve, reject) => {
+  private post<T>(url: string, body: RequestInit["body"]): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
       fetch(url, {
         method: "post",
-        body: data,
+        body,
         mode: "cors"
       })
         .then(res => {
-          resolve(res);
+          if (res.status === 204) {
+            return resolve();
+          }
+
+          return res.json();
+        })
+        .then(data => {
+          resolve(data);
         })
         .catch(error => {
           reject(error);
@@ -44,11 +51,9 @@ class HttpClient {
           return response.json();
         })
         .then(data => {
-          console.log("data", data);
           resolve(data);
         })
         .catch(error => {
-          console.log("error", error);
           reject(error);
         });
     });
@@ -58,9 +63,7 @@ class HttpClient {
     return new Promise((resolve, reject) => {
       fetch(`${this.url}${path}`)
         .then(response => {
-          console.log(response);
           if (!response.ok) throw Error(response.statusText);
-
           if (response.body) {
             return response.body.getReader().read();
           }
@@ -69,7 +72,6 @@ class HttpClient {
           resolve(result);
         })
         .catch(error => {
-          console.log("error", error);
           reject(error);
         });
     });
@@ -83,17 +85,21 @@ class HttpClient {
     return this.getFile(`sounds/${id}`);
   }
 
-  public getUrlsForUpload(soundName: string) {
-    return this.get(`sounds/upload-url?name=${soundName}`);
+  public getUrlsForUpload(
+    soundName: string
+  ): Promise<GetUrlsForUploadResponse> {
+    return this.get<GetUrlsForUploadResponse>(
+      `sounds/upload-url?name=${soundName}`
+    );
   }
 
-  public uploadFile(uploadUrl: string, file: File, fields: any) {
+  public uploadFileUsingPresignedUrl(presignedPost: PresignedPost, file: File) {
     const formData = new FormData();
-    Object.keys(fields).forEach(key => {
-      formData.append(key, fields[key]);
+    Object.keys(presignedPost.fields).forEach(key => {
+      formData.append(key, presignedPost.fields[key]);
     });
     formData.append("file", file);
-    return this.post(uploadUrl, formData);
+    return this.post(presignedPost.url, formData);
   }
 }
 
