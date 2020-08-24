@@ -46,34 +46,40 @@ export default class AdminPanel extends Vue {
       (v && v.length <= 10) || "Name must be less than 10 characters"
   ];
 
+  async mounted() {
+    // const res = await this.$api.getSound(
+    //   "15a0a3b7-1aad-4c4a-8b58-db5d8e825d87"
+    // );
+    // console.log(res);
+  }
+
   private fileRules = [(v: File) => !!v];
 
   private soundName = "";
-  private soundFile = null;
-  private soundIcon = null;
+  private soundFile: File | null = null;
+  private soundIcon: File | null = null;
 
   public async addSound() {
     console.log("click");
     console.log(this.soundFile);
     console.log(this.soundIcon);
-    const presignedUrls = await this.$api.getUrlsForUpload(this.soundName);
+    if (this.soundFile && this.soundIcon) {
+      const presignedUrls = await this.$api.getUrlsForUpload(this.soundName);
 
-    const uploadSoundPromise = this.$api.uploadFile(
-      presignedUrls.upload_url_sound.url,
-      this.soundFile,
-      presignedUrls.upload_url_sound.fields
-    );
-
-    const uploadIconPromise = this.$api.uploadFile(
-      presignedUrls.upload_url_icon.url,
-      this.soundIcon,
-      presignedUrls.upload_url_icon.fields
-    );
-
-    const uploadResponse = await Promise.all([
-      uploadSoundPromise,
-      uploadIconPromise
-    ]);
+      const uploadSoundPromise = this.$api.uploadFileUsingPresignedUrl(
+        presignedUrls.upload_url_sound,
+        this.soundFile
+      );
+      const uploadIconPromise = this.$api.uploadFileUsingPresignedUrl(
+        presignedUrls.upload_url_icon,
+        this.soundIcon
+      );
+      const uploadResponse = await Promise.all([
+        uploadSoundPromise,
+        uploadIconPromise
+      ]);
+      console.log(uploadResponse);
+    }
   }
 }
 </script>
